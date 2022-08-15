@@ -13,7 +13,8 @@
 #include <Udp.h>
 
 #define SEVENZYYEARS 2208988800UL
-#define NTP_PACKET_SIZE 48
+// #define NTP_PACKET_SIZE 48
+const int NTP_PACKET_SIZE PROGMEM = 48;
 
 class NTPClientPlus
 {
@@ -23,15 +24,15 @@ class NTPClientPlus
     uint16_t port = 1337;
     int timeOffset;
     uint16_t updateInterval;  // In ms
-    uint32_t currentEpoc = 0;      // In s
+    uint32_t unixtime = 0;      // In s
     uint32_t lastUpdate = 0;      // In ms
-    bool wasSummertime = true;
+    bool summertime = true;
     bool considerSummertime = true;
     const char* poolServerName;
     uint8_t packetBuffer[NTP_PACKET_SIZE];
 
     void sendNTPPacket();
-    uint32_t getRawUnixTime() const;
+    
     uint8_t getRawHour() const;
     uint8_t getRawMonthDay() const;
     uint8_t getRawMonth() const;
@@ -73,7 +74,7 @@ class NTPClientPlus
     
     String getFormattedTime();
     String getFullFormattedTime();
-    uint32_t getUnixTime();
+    uint32_t getUnixTime() const;
 
     void setConsiderSummertime(bool considerSummertime);
     bool getConsiderSummertime() const;

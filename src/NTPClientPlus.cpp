@@ -80,7 +80,7 @@ bool NTPClientPlus::forceUpdate()
     // this is NTP time (seconds since Jan 1 1900):
     unsigned long secsSince1900 = highWord << 16 | lowWord;
 
-    currentEpoc = secsSince1900 - SEVENZYYEARS;
+    unixtime = secsSince1900 - SEVENZYYEARS;
 
     return true;
 }
@@ -149,9 +149,9 @@ uint8_t NTPClientPlus::getMonth()
 uint8_t NTPClientPlus::getMonthDay()
 {
     time_t rawtime = getUnixTime();
-    struct tm *ti;
+    struct tm* ti;
     ti = localtime(&rawtime);
-    int monthDay = (ti->tm_mday) < 10 ? 0 + (ti->tm_mday) : (ti->tm_mday);
+    int monthDay = ti->tm_hour;
 
     return monthDay;
 }
@@ -192,14 +192,18 @@ uint8_t NTPClientPlus::getSecond()
  */
 String NTPClientPlus::getFormattedTime()
 {
-    unsigned long rawTime = getUnixTime();
-    unsigned long hours = (rawTime % 86400L) / 3600;
+    time_t offset = (considerSummertime && isSummertime()) ? 3600 : 0; 
+    time_t rawtime = getUnixTime() + offset;
+    struct tm* ti;
+    ti = localtime(&rawtime);
+
+    uint8_t hours = ti->tm_hour;
     String hoursStr = hours < 10 ? "0" + String(hours) : String(hours);
 
-    unsigned long minutes = (rawTime % 3600) / 60;
+    uint8_t minutes = ti->tm_min;
     String minuteStr = minutes < 10 ? "0" + String(minutes) : String(minutes);
 
-    unsigned long seconds = rawTime % 60;
+    uint8_t seconds = ti->tm_sec;
     String secondStr = seconds < 10 ? "0" + String(seconds) : String(seconds);
 
     return hoursStr + ":" + minuteStr + ":" + secondStr;
@@ -210,8 +214,9 @@ String NTPClientPlus::getFormattedTime()
  */
 String NTPClientPlus::getFullFormattedTime()
 {
+    // time_t offset = (considerSummertime && isSummertime()) ? 3600 : 0; 
     time_t rawtime = getUnixTime();
-    struct tm *ti;
+    struct tm* ti;
     ti = localtime(&rawtime);
 
     uint16_t year = ti->tm_year + 1900;
@@ -234,13 +239,6 @@ String NTPClientPlus::getFullFormattedTime()
 
     return yearStr + "-" + monthStr + "-" + dayStr + " " +
            hoursStr + ":" + minuteStr + ":" + secondStr;
-}
-
-uint32_t NTPClientPlus::getUnixTime()
-{
-    
-        return getRawUnixTime() + 3600;
-    return getRawUnixTime();
 }
 
 /**
@@ -269,30 +267,41 @@ bool NTPClientPlus::getConsiderSummertime() const
  */
 bool NTPClientPlus::isSummertime()
 {
+    time_t rawtime = getUnixTime();
+    struct tm* ti;
+    ti = localtime(&rawtime);
+
+    uint16_t year = ti->tm_year + 1900;
+    uint8_t month = ti->tm_mon + 1;
+    uint8_t monthDay = ti->tm_mday;
+    uint8_t hour = ti->tm_hour;
+
+    summertime = (month < 3 || getRawMonth() > 10);
+
     if (getRawMonth() < 3 || getRawMonth() > 10)
     {
-        wasSummertime = false;
-        return false;
+        summertime = false;
+        return summertime;
     }
     if (getRawMonth() > 3 && getRawMonth() < 10)
     {
-        wasSummertime = true;
-        return true;
+        summertime = true;
+        return summertime;
     }
     if (getRawMonth() == 3 && (getRawHour() + 24 * getRawMonthDay()) >= (2 + 24 * (31 - (5 * getRawYear() / 4 + 4) % 7)))
     {
-        wasSummertime = true;
+        summertime = true;
         return true;
     }
 
-    if (wasSummertime && getRawMonth() == 10 && (getRawHour() + 24 * getRawMonthDay()) < (3 + 24 * (31 - (5 * getRawYear() / 4 + 1) % 7)))
+    if (summertime && getRawMonth() == 10 && (getRawHour() + 24 * getRawMonthDay()) < (3 + 24 * (31 - (5 * getRawYear() / 4 + 1) % 7)))
     {
-        wasSummertime = true;
+        summertime = true;
         return true;
     }
     else
     {
-        wasSummertime = false;
+        summertime = false;
         return false;
     }
 }
@@ -323,19 +332,19 @@ void NTPClientPlus::sendNTPPacket()
     udp->endPacket();
 }
 
-uint32_t NTPClientPlus::getRawUnixTime() const
+uint32_t NTPClientPlus::getUnixTime() const
 {
-    return timeOffset + currentEpoc + ((millis() - lastUpdate) / 1000);
+    return timeOffset + unixtime + ((millis() - lastUpdate) / 1000);
 }
 
 uint8_t NTPClientPlus::getRawHour() const
 {
-    return ((getRawUnixTime() % 86400L) / 3600);
+    return ((getUnixTime() % 86400L) / 3600);
 }
 
 uint8_t NTPClientPlus::getRawMonthDay() const
 {
-    time_t rawtime = getRawUnixTime();
+    time_t rawtime = getUnixTime();
     struct tm *ti;
     ti = localtime(&rawtime);
     int monthDay = (ti->tm_mday) < 10 ? 0 + (ti->tm_mday) : (ti->tm_mday);
@@ -345,7 +354,7 @@ uint8_t NTPClientPlus::getRawMonthDay() const
 
 uint8_t NTPClientPlus::getRawMonth() const
 {
-    time_t rawtime = getRawUnixTime();
+    time_t rawtime = getUnixTime();
     struct tm *ti;
     ti = localtime(&rawtime);
     int month = (ti->tm_mon + 1) < 10 ? 0 + (ti->tm_mon + 1) : (ti->tm_mon + 1);
@@ -355,7 +364,7 @@ uint8_t NTPClientPlus::getRawMonth() const
 
 uint16_t NTPClientPlus::getRawYear() const
 {
-    time_t rawtime = getRawUnixTime();
+    time_t rawtime = getUnixTime();
     struct tm *ti;
     ti = localtime(&rawtime);
     int year = ti->tm_year + 1900;
