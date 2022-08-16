@@ -2,49 +2,46 @@
 
 NTPTime::NTPTime(const char* timezone, uint32_t updateInterval, const char* ntpServer)
 {
-    this->timezone = timezone;
-    this->updateInterval = updateInterval;
-    this->ntpServer = ntpServer;
-    udp = new WiFiUDP;
-}
-
-NTPTime::NTPTime(UDP& udp, const char* timezone, uint32_t updateInterval, const char* ntpServer)
-{
-    this->udp = &udp;
-    this->timezone = timezone;
+    setTimezone(timezone);
     this->updateInterval = updateInterval;
     this->ntpServer = ntpServer;
 }
 
-NTPTime::~NTPTime()
+void NTPTime::setServer(const char* ntpServer)
 {
-    end();
+    this->ntpServer = ntpServer;
 }
 
-void NTPTime::begin(uint16_t port)
+const char* NTPTime::getServer() const
 {
-    udp->begin(port);
-    udpSetUp = true;
-}
-
-void NTPTime::end()
-{
-    udp->stop();
-    delete udp;
+    return ntpServer;
 }
 
 bool NTPTime::update()
 {
-    if ((millis() - lastUpdate >= updateInterval) || lastUpdate == 0)
+    time(&unixtime);
+    static uint32_t lastUpdate = 0;
+    if((millis() - lastUpdate >= updateInterval) || lastUpdate == 0)
     {
-        if(!udpSetUp)
-            begin();
-        return forceUpdate();
+        forceUpdate();
+        lastUpdate = millis();
+        return true;
     }
-    return true;
+    return false;
 }
 
-bool NTPTime::forceUpdate()
+void NTPTime::forceUpdate()
 {
-    
+    configTzTime(timezone, ntpServer);
+    time(&unixtime);
+}
+
+void NTPTime::setUpdateInterval(uint32_t updateInterval)
+{
+    this->updateInterval = updateInterval;
+}
+
+uint32_t NTPTime::getUpdateInterval() const
+{
+    return updateInterval;
 }

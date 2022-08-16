@@ -53,12 +53,12 @@ class ESPTime
 {
     protected:
     time_t unixtime = 0;
-    const char* timezone = "UTC0";
+    const char* timezone = TZ_Etc_UTC;
 
     public:
-    ESPTime(time_t unixtime, const char* timezone = "UTC0");
-    ESPTime(const Time& time, const char* timezone = "UTC0");
-    ESPTime(const char* timezone = "UTC0");
+    ESPTime(time_t unixtime, const char* timezone = TZ_Etc_UTC);
+    ESPTime(const Time& time, const char* timezone = TZ_Etc_UTC);
+    ESPTime(const char* timezone = TZ_Etc_UTC);
 
     virtual void setTime(time_t unixtime);
     virtual bool setTime(Time time);
