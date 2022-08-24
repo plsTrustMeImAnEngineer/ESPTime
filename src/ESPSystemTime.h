@@ -10,14 +10,15 @@
 #endif
 
 
-class NTPTime : public ESPTime
+class ESPSystemTime : public ESPTime
 {
     private:
     const char* ntpServer;
+    bool ntpSync = true;
     uint32_t updateInterval; // in in ms
 
     public:
-    NTPTime(const char* timezone = TZ_Etc_UTC, uint32_t updateInterval = 60000, const char* ntpServer = "pool.ntp.org");
+    ESPSystemTime(const char* timezone = TZ_Etc_UTC, uint32_t updateInterval = 60000, bool ntpSync = true, const char* ntpServer = "pool.ntp.org");
 
     void setServer(const char* ntpServer);
     const char* getServer() const;
@@ -28,6 +29,8 @@ class NTPTime : public ESPTime
     bool update();
     void forceUpdate();
 
+    void setNTPSync(bool isA);
+    bool isNTPSync() const;
 };
 
 #endif
