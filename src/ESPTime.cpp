@@ -1,27 +1,55 @@
 #include <ESPTime.h>
 
+/**
+ * @brief Construct a new ESPTime::ESPTime object
+ * 
+ * @param unixtime Unixtimestamp to initialize the object with
+ * @param timezone The timezone-string (Recommendation: Use macro from Timezones.h)
+ */
 ESPTime::ESPTime(time_t unixtime, const char* timezone)
 {
     this->unixtime = unixtime;
     setTimezone(timezone);
 }
 
+/**
+ * @brief Construct a new ESPTime::ESPTime object
+ * 
+ * @param time Time-struct to initialize the object with
+ * @param timezone The timezone-string (Recommendation: Use macro from Timezones.h)
+ */
 ESPTime::ESPTime(const Time& time, const char* timezone)
 {
     this->unixtime = setTime(time);
     setTimezone(timezone);
 }
 
+/**
+ * @brief Construct a new ESPTime::ESPTime object
+ * 
+ * @param timezone The timezone-string (Recommendation: Use macro from Timezones.h)
+ */
 ESPTime::ESPTime(const char* timezone)
 {
     setTimezone(timezone);
 }
 
+/**
+ * @brief Sets the Time
+ * 
+ * @param unixtime 
+ */
 void ESPTime::setTime(time_t unixtime)
 {
     this->unixtime = unixtime;
 }
 
+/**
+ * @brief Sets the Time
+ * 
+ * @param time Time-struct containing all necessary time information
+ * @return true, if Time-struct is valid
+ */
 bool ESPTime::setTime(Time time)
 {
     if(time.year == 0 || time.month == 0 || time.monthDay == 0) return false;
@@ -37,6 +65,11 @@ bool ESPTime::setTime(Time time)
     return true;
 }
 
+/**
+ * @brief Sets the Timezone
+ * 
+ * @param timezone 
+ */
 void ESPTime::setTimezone(const char* timezone)
 {
     setenv("TZ", timezone, true);
@@ -44,16 +77,25 @@ void ESPTime::setTimezone(const char* timezone)
     this->timezone = timezone;
 }
 
+/** 
+ * @return The current Timezone
+ */
 const char* ESPTime::getTimezone() const
 {
     return timezone;
 }
 
+/** 
+ * @return The Unix-Timestamp
+ */
 time_t ESPTime::getUnixTime() const
 {
     return unixtime;
 }
 
+/** 
+ * @return A Time-struct containing all the Time information
+ */
 Time ESPTime::getTime() const
 {
     tm timeStruct = *localtime(&unixtime);
@@ -70,60 +112,90 @@ Time ESPTime::getTime() const
     return time;
 }
 
+/** 
+ * @return The year
+ */
 uint16_t ESPTime::getYear() const
 {
     tm timeStruct = *localtime(&unixtime);
     return timeStruct.tm_year + 1900;
 }
 
+/** 
+ * @return The month 1 - 12
+ */
 uint8_t ESPTime::getMonth() const
 {
     tm timeStruct = *localtime(&unixtime);
     return timeStruct.tm_mon + 1;
 }
 
+/** 
+ * @return The day of the year 1 - 366
+ */
 uint16_t ESPTime::getYearDay() const
 {
     tm timeStruct = *localtime(&unixtime);
     return timeStruct.tm_yday + 1;
 }
 
+/** 
+ * @return The day of the month 1 - 31 
+ */
 uint8_t ESPTime::getMonthDay() const
 {
     tm timeStruct = *localtime(&unixtime);
     return timeStruct.tm_mday;
 }
 
+/** 
+ * @return The day of the week 0 - 6, 0 being Sunday 
+ */
 uint8_t ESPTime::getWeekDay() const
 {
     tm timeStruct = *localtime(&unixtime);
     return timeStruct.tm_wday;
 }
 
+/** 
+ * @return The hours sinnce midnight 0 - 23
+ */
 uint8_t ESPTime::getHour() const
 {
     tm timeStruct = *localtime(&unixtime);
     return timeStruct.tm_hour;
 }
 
+/** 
+ * @return The minutes since full hour 0 - 59 
+ */
 uint8_t ESPTime::getMinute() const
 {
     tm timeStruct = *localtime(&unixtime);
     return timeStruct.tm_min;
 }
 
+/** 
+ * @return The seconds since full minute 0 - 59 (0 - 61 for leap seconds) 
+ */
 uint8_t ESPTime::getSecond() const
 {
     tm timeStruct = *localtime(&unixtime);
     return timeStruct.tm_sec;
 }
 
+/** 
+ * @return true, if Daylight Saving Time(Summertime) is active 
+ */
 uint8_t ESPTime::isDST() const
 {
     tm timeStruct = *localtime(&unixtime);
     return (bool)timeStruct.tm_isdst;
 }
 
+/** 
+ * @return String containing time formatted like HH:MM:SS
+ */
 String ESPTime::getFormattedTime() const
 {
     tm timeStruct = *localtime(&unixtime);
@@ -133,6 +205,9 @@ String ESPTime::getFormattedTime() const
     return hour + ":" + minute + ":" + second;
 }
 
+/** 
+ * @return String containing date formatted like YYYY-MM-DD
+ */
 String ESPTime::getFormattedDate() const
 {
     tm timeStruct = *localtime(&unixtime);
@@ -142,17 +217,30 @@ String ESPTime::getFormattedDate() const
     return year + "-" + month + "-" + day;
 }
 
+/** 
+ * @return String containing date and time formatted like YYYY-MM-DD HH:MM:SS
+ */
 String ESPTime::getFormattedDateTime() const
 {
     return getFormattedDate() + " " + getFormattedTime();
 }
 
+/**
+ * @brief Assingns time using =
+ * 
+ * @param unixtime 
+ */
 ESPTime& ESPTime::operator=(time_t unixtime)
 {
     setTime(unixtime);
     return *this;
 }
 
+/**
+ * @brief Assigns time using =
+ * 
+ * @param time Time-struct containing all necessary time information
+ */
 ESPTime& ESPTime::operator=(const Time& time)
 {
     setTime(time);

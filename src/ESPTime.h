@@ -36,6 +36,9 @@ enum WeekDay : uint8_t
     Sunday = 0
 };
 
+/**
+ * @brief Struct to store all important time information
+ */
 struct Time
 {
     uint16_t year = 0;

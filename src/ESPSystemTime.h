@@ -3,10 +3,12 @@
 
 #include <ESPTime.h>
 
-#ifdef ESP8266
+#if defined(ESP8266)
 #include <ESP8266WiFi.h>
-#else
+#elif defined(ESP32)
 #include <WiFi.h>
+#else 
+#warning Library incompatible. Use ESP32 or ESP8266
 #endif
 
 

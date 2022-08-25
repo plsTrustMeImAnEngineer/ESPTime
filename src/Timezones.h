@@ -1,6 +1,12 @@
 #ifndef Timezones_h
 #define Tiemzones_h
 
+/**
+ * @brief This header contains macros for all Timezones.
+ * It's highly recommended to use these, in order to avoid errors
+ * 
+ */
+
 #define TZ_Africa_Abidjan	"GMT0"
 #define TZ_Africa_Accra	"GMT0"
 #define TZ_Africa_Addis_Ababa	"EAT-3"

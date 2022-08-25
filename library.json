@@ -1,0 +1,22 @@
+{
+    "name": "ESPTime",
+    "version": "1.0.0",
+    "description": "A simple library for converting Time into different formats, and syncing ESPs system time",
+    "keywords": "time, clock, ntpclient, ntp, system time, esp32, esp8266",
+    "repository":
+    {
+      "type": "git",
+      "url": "https://github.com/plsTrustMeImAnEngineer/ESPTime.git"
+    },
+    "authors":
+    [
+      {
+        "name": "Samuel Lehnen",
+        "email": "samuel.t.lehnen@gmail.com",
+        "maintainer": true
+      }
+    ],
+    "license": "MIT",
+    "frameworks": "arduino",
+    "platforms": ["espressif32", "espressif8266"]
+  }
