@@ -15,9 +15,9 @@
 class ESPSystemTime : public ESPTime
 {
     private:
-    const char* ntpServer;
-    bool ntpSync = true;
-    uint32_t updateInterval; // in in ms
+    const char* _ntpServer;
+    bool _ntpSync = true;
+    uint32_t _updateInterval; // in in ms
 
     public:
     ESPSystemTime(const char* timezone = TZ_Etc_UTC, uint32_t updateInterval = 60000, bool ntpSync = true, const char* ntpServer = "pool.ntp.org");

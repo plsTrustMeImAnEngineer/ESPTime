@@ -55,8 +55,8 @@ struct Time
 class ESPTime
 {
     protected:
-    time_t unixtime = 0;
-    const char* timezone = TZ_Etc_UTC;
+    time_t _unixtime = 0;
+    const char* _timezone = TZ_Etc_UTC;
 
     public:
     ESPTime(time_t unixtime, const char* timezone = TZ_Etc_UTC);

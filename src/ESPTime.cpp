@@ -8,7 +8,7 @@
  */
 ESPTime::ESPTime(time_t unixtime, const char* timezone)
 {
-    this->unixtime = unixtime;
+    _unixtime = unixtime;
     setTimezone(timezone);
 }
 
@@ -20,7 +20,7 @@ ESPTime::ESPTime(time_t unixtime, const char* timezone)
  */
 ESPTime::ESPTime(const Time& time, const char* timezone)
 {
-    this->unixtime = setTime(time);
+    _unixtime = setTime(time);
     setTimezone(timezone);
 }
 
@@ -41,7 +41,7 @@ ESPTime::ESPTime(const char* timezone)
  */
 void ESPTime::setTime(time_t unixtime)
 {
-    this->unixtime = unixtime;
+    _unixtime = unixtime;
 }
 
 /**
@@ -61,7 +61,7 @@ bool ESPTime::setTime(Time time)
     timeStruct.tm_min = time.minute;
     timeStruct.tm_sec = time.second;
     timeStruct.tm_isdst = time.dst;
-    unixtime = mktime(&timeStruct);
+    _unixtime = mktime(&timeStruct);
     return true;
 }
 
@@ -74,7 +74,7 @@ void ESPTime::setTimezone(const char* timezone)
 {
     setenv("TZ", timezone, true);
     tzset();
-    this->timezone = timezone;
+    _timezone = timezone;
 }
 
 /** 
@@ -82,7 +82,7 @@ void ESPTime::setTimezone(const char* timezone)
  */
 const char* ESPTime::getTimezone() const
 {
-    return timezone;
+    return _timezone;
 }
 
 /** 
@@ -90,7 +90,7 @@ const char* ESPTime::getTimezone() const
  */
 time_t ESPTime::getUnixTime() const
 {
-    return unixtime;
+    return _unixtime;
 }
 
 /** 
@@ -98,7 +98,7 @@ time_t ESPTime::getUnixTime() const
  */
 Time ESPTime::getTime() const
 {
-    tm timeStruct = *localtime(&unixtime);
+    tm timeStruct = *localtime(&_unixtime);
     Time time;
     time.year = timeStruct.tm_year + 1900;
     time.month = timeStruct.tm_mon + 1;
@@ -117,7 +117,7 @@ Time ESPTime::getTime() const
  */
 uint16_t ESPTime::getYear() const
 {
-    tm timeStruct = *localtime(&unixtime);
+    tm timeStruct = *localtime(&_unixtime);
     return timeStruct.tm_year + 1900;
 }
 
@@ -126,7 +126,7 @@ uint16_t ESPTime::getYear() const
  */
 uint8_t ESPTime::getMonth() const
 {
-    tm timeStruct = *localtime(&unixtime);
+    tm timeStruct = *localtime(&_unixtime);
     return timeStruct.tm_mon + 1;
 }
 
@@ -135,7 +135,7 @@ uint8_t ESPTime::getMonth() const
  */
 uint16_t ESPTime::getYearDay() const
 {
-    tm timeStruct = *localtime(&unixtime);
+    tm timeStruct = *localtime(&_unixtime);
     return timeStruct.tm_yday + 1;
 }
 
@@ -144,7 +144,7 @@ uint16_t ESPTime::getYearDay() const
  */
 uint8_t ESPTime::getMonthDay() const
 {
-    tm timeStruct = *localtime(&unixtime);
+    tm timeStruct = *localtime(&_unixtime);
     return timeStruct.tm_mday;
 }
 
@@ -153,7 +153,7 @@ uint8_t ESPTime::getMonthDay() const
  */
 uint8_t ESPTime::getWeekDay() const
 {
-    tm timeStruct = *localtime(&unixtime);
+    tm timeStruct = *localtime(&_unixtime);
     return timeStruct.tm_wday;
 }
 
@@ -162,7 +162,7 @@ uint8_t ESPTime::getWeekDay() const
  */
 uint8_t ESPTime::getHour() const
 {
-    tm timeStruct = *localtime(&unixtime);
+    tm timeStruct = *localtime(&_unixtime);
     return timeStruct.tm_hour;
 }
 
@@ -171,7 +171,7 @@ uint8_t ESPTime::getHour() const
  */
 uint8_t ESPTime::getMinute() const
 {
-    tm timeStruct = *localtime(&unixtime);
+    tm timeStruct = *localtime(&_unixtime);
     return timeStruct.tm_min;
 }
 
@@ -180,7 +180,7 @@ uint8_t ESPTime::getMinute() const
  */
 uint8_t ESPTime::getSecond() const
 {
-    tm timeStruct = *localtime(&unixtime);
+    tm timeStruct = *localtime(&_unixtime);
     return timeStruct.tm_sec;
 }
 
@@ -189,7 +189,7 @@ uint8_t ESPTime::getSecond() const
  */
 uint8_t ESPTime::isDST() const
 {
-    tm timeStruct = *localtime(&unixtime);
+    tm timeStruct = *localtime(&_unixtime);
     return (bool)timeStruct.tm_isdst;
 }
 
@@ -198,7 +198,7 @@ uint8_t ESPTime::isDST() const
  */
 String ESPTime::getFormattedTime() const
 {
-    tm timeStruct = *localtime(&unixtime);
+    tm timeStruct = *localtime(&_unixtime);
     String hour = timeStruct.tm_hour < 10 ? "0" + String(timeStruct.tm_hour) : String(timeStruct.tm_hour);
     String minute = timeStruct.tm_min < 10 ? "0" + String(timeStruct.tm_min) : String(timeStruct.tm_min);
     String second = timeStruct.tm_sec < 10 ? "0" + String(timeStruct.tm_sec) : String(timeStruct.tm_sec);
@@ -210,7 +210,7 @@ String ESPTime::getFormattedTime() const
  */
 String ESPTime::getFormattedDate() const
 {
-    tm timeStruct = *localtime(&unixtime);
+    tm timeStruct = *localtime(&_unixtime);
     String year(timeStruct.tm_year + 1900);
     String month = timeStruct.tm_mon + 1 < 10 ? "0" + String(timeStruct.tm_mon + 1) : String(timeStruct.tm_mon + 1);
     String day = timeStruct.tm_mday < 10 ? "0" + String(timeStruct.tm_mday) : String(timeStruct.tm_mday);

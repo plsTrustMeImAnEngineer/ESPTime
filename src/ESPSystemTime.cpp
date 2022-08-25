@@ -11,9 +11,9 @@
 ESPSystemTime::ESPSystemTime(const char* timezone, uint32_t updateInterval, bool ntpSync, const char* ntpServer)
 {
     setTimezone(timezone);
-    this->updateInterval = updateInterval;
-    this->ntpSync = ntpSync;
-    this->ntpServer = ntpServer;
+    _updateInterval = updateInterval;
+    _ntpSync = ntpSync;
+    _ntpServer = ntpServer;
 
     if(ntpSync) forceUpdate();
 }
@@ -25,7 +25,7 @@ ESPSystemTime::ESPSystemTime(const char* timezone, uint32_t updateInterval, bool
  */
 void ESPSystemTime::setServer(const char* ntpServer)
 {
-    this->ntpServer = ntpServer;
+    _ntpServer = ntpServer;
 }
 
 /**
@@ -33,7 +33,7 @@ void ESPSystemTime::setServer(const char* ntpServer)
  */
 const char* ESPSystemTime::getServer() const
 {
-    return ntpServer;
+    return _ntpServer;
 }
 
 /**
@@ -44,9 +44,9 @@ const char* ESPSystemTime::getServer() const
  */
 bool ESPSystemTime::update()
 {
-    time(&unixtime);
+    time(&_unixtime);
     static uint32_t lastUpdate = 0;
-    if((millis() - lastUpdate >= updateInterval) || lastUpdate == 0)
+    if((millis() - lastUpdate >= _updateInterval) || lastUpdate == 0)
     {
         forceUpdate(); 
         lastUpdate = millis();
@@ -60,8 +60,8 @@ bool ESPSystemTime::update()
  */
 void ESPSystemTime::forceUpdate()
 {
-    if(ntpSync) configTzTime(timezone, ntpServer);
-    time(&unixtime);
+    if(_ntpSync) configTzTime(_timezone, _ntpServer);
+    time(&_unixtime);
 }
 
 /**
@@ -71,7 +71,7 @@ void ESPSystemTime::forceUpdate()
  */
 void ESPSystemTime::setUpdateInterval(uint32_t updateInterval)
 {
-    this->updateInterval = updateInterval;
+    _updateInterval = updateInterval;
 }
 
 /** 
@@ -79,7 +79,7 @@ void ESPSystemTime::setUpdateInterval(uint32_t updateInterval)
  */
 uint32_t ESPSystemTime::getUpdateInterval() const
 {
-    return updateInterval;
+    return _updateInterval;
 }
 
 /**
@@ -89,7 +89,7 @@ uint32_t ESPSystemTime::getUpdateInterval() const
  */
 void ESPSystemTime::setNTPSync(bool isActive)
 {
-    ntpSync = isActive;
+    _ntpSync = isActive;
 }
 
 /**
@@ -97,5 +97,5 @@ void ESPSystemTime::setNTPSync(bool isActive)
  */
 bool ESPSystemTime::isNTPSync() const
 {
-    return ntpSync;
+    return _ntpSync;
 }
